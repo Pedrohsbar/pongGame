@@ -1,7 +1,7 @@
 //variaveis da bolinha
 let xBolinha = 300;
 let yBolinha = 200;
-let diametro = 20;
+let diametro = 15;
 let raio = diametro / 2 ;
 
 //variaveis da bolinha
@@ -23,8 +23,20 @@ let velocidadeYOponente;
 let meusPontos = 0;
 let pontosOponente = 0; 
 
+//sons do jogo
+let raquetada;
+let ponto;
+let trilha;
+
+function preload(){
+  trilha = loadSound ("trilha.mp3");
+  ponto = loadSound ("ponto.mp3");
+  raquetada = loadSound ("raquetada.mp3");
+}
+
 function setup() {
   createCanvas(600, 400);
+  trilha.loop();
 }
 
 function draw() {
@@ -34,12 +46,14 @@ function draw() {
   verificaColisaoBordas();
   mostraRaquete(xRaquete, yRaquete);
   movimentarRaquete();
+  movimentarSegundaRaquete();
   verificaColisaoRaquete();
   mostraRaquete(xRaqueteOponente, yRaqueteOponente);
-  movimentaRaqueteOponente();
+  //movimentaRaqueteOponenteAutonoma();
   verificaColisaoRaqueteOponente();
   incluiPlancar();
   marcaPonto();
+  colisaoRaqueteBorda();
 }
 
 function mostraBolinha(){
@@ -64,7 +78,16 @@ function movimentarRaquete(){
   }
 }
 
-function movimentaRaqueteOponente(){
+function movimentarSegundaRaquete(){
+  if ( keyIsDown (87) ){
+    yRaqueteOponente -= 10;
+  }
+  if ( keyIsDown (83) ){
+    yRaqueteOponente += 10;
+  }
+}
+
+function movimentaRaqueteOponenteAutonoma(){
   velocidadeYOponente = yBolinha - yRaqueteOponente - comprimentoRaquete / 2 - 30;
   yRaqueteOponente += velocidadeYOponente
   }
@@ -77,17 +100,20 @@ function verificaColisaoBordas(){
 
 function verificaColisaoRaquete(){
   if ( xBolinha - raio < xRaquete + comprimentoRaquete && yBolinha - raio < yRaquete + alturaRaquete && yBolinha + raio > yRaquete ){ 
-    velocidadeXBolinha *= -1
+    velocidadeXBolinha *= -1;
+    raquetada.play();
   }
 }
 
 function verificaColisaoRaqueteOponente(){
   if ( xBolinha + raio > xRaqueteOponente && yBolinha - raio < yRaqueteOponente + alturaRaquete && yBolinha + raio > yRaqueteOponente ){ 
-    velocidadeXBolinha *= -1
+    velocidadeXBolinha *= -1;
+    raquetada.play();
   }
 }
 
 function incluiPlancar(){
+  stroke( 255 )
   textAlign(CENTER);
   textSize( 17 );
   fill( color ( 255, 140, 0));
@@ -103,8 +129,17 @@ function incluiPlancar(){
 function marcaPonto(){
   if ( xBolinha > 590 ){
     meusPontos += 1;
+    ponto.play();
   }
   if ( xBolinha < 10 ){
     pontosOponente += 1;
+    ponto.play();
   }
+}
+
+function colisaoRaqueteBorda(){
+  if ( yRaquete + alturaRaquete > height ) { yRaquete = 310 };
+  if ( yRaqueteOponente + alturaRaquete > height ) { yRaqueteOponente = 310 };
+  if ( yRaquete - alturaRaquete < -80 ) { yRaquete = 1 };
+  if ( yRaqueteOponente - alturaRaquete < -80 ) { yRaqueteOponente = 1 };
 }
